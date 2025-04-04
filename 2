@@ -2,19 +2,22 @@
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local CoreGui = game:GetService("CoreGui")
 local Players = game:GetService("Players")
-local PlayerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Wait for LocalPlayer to load
+local Player = Players.LocalPlayer
+repeat wait() until Player
 
 --// Coordinates and Delay \\--
 local X, Y = 680, 620
 local Interval = 0.1 -- seconds between clicks
 
---// Create ScreenGui to show dot \\--
+--// Create ScreenGui in CoreGui to avoid removal on death \\--
 local gui = Instance.new("ScreenGui")
 gui.Name = "ClickDotGUI"
 gui.ResetOnSpawn = false
 gui.IgnoreGuiInset = true
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-gui.Parent = PlayerGui
+gui.Parent = CoreGui
 
 --// Create Dot Indicator \\--
 local dot = Instance.new("Frame")
@@ -32,9 +35,13 @@ local corner = Instance.new("UICorner")
 corner.CornerRadius = UDim.new(1, 0)
 corner.Parent = dot
 
---// AutoClick Loop \\--
-while true do
-    VirtualInputManager:SendMouseButtonEvent(X, Y, 0, true, game, 1)
-    VirtualInputManager:SendMouseButtonEvent(X, Y, 0, false, game, 1)
-    task.wait(Interval)
-end
+--// AutoClick Loop (Runs independently) \\--
+spawn(function()
+    while true do
+        pcall(function()
+            VirtualInputManager:SendMouseButtonEvent(X, Y, 0, true, game, 1)
+            VirtualInputManager:SendMouseButtonEvent(X, Y, 0, false, game, 1)
+        end)
+        task.wait(Interval)
+    end
+end)
