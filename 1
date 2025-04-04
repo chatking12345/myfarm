@@ -415,7 +415,15 @@ end)
 		local LastEquipCheck = 0;
 		GotoEntity(Data.Entity);
 
-		
+		repeat
+			task.wait(0.001)
+			local CurrentTime = tick()
+
+			local Percentage = (EntityHumanoid.Health / EntityHumanoid.MaxHealth) * 100
+			if Percentage <= 25 then
+				if not voidBoss then
+					local maid = Maid.new()
+					voidBoss = maid
 
                     Dependencies.Notifier:SendNotification("Info", `{NormalizeName(Data.Entity.Name)} is at {string.format("%.1f", Percentage)} % HP, attempting to void`, 5)
 
